@@ -1,0 +1,58 @@
+Table recipe as r {
+  id int
+  name text
+  image text(path)
+  description text
+  time interval
+}
+
+Table tag as t {
+  id int
+  name text
+  color text(hex)
+  slug text(slug)
+}
+
+Table ingridient as i{
+  id int
+  name text
+  unit text
+}
+
+Table recipe_tags as rt {
+  id int
+  recipe int [ref: > r.id]
+  tag int [ref: > t.id ]
+}
+
+Table recipe_ingridients as ri {
+  id int
+  recipe int [ref: > r.id ]
+  ingridient int [ref: > i.id]
+  quantity int
+}
+
+Table user as u {
+  id int
+  name text
+  email text(email)
+  role text
+}
+
+Table user_favorites {
+  id int
+  user int [ref: > u.id]
+  recipe int [ref: > r.id]
+}
+
+Table user_follows {
+  id int
+  user int [ref: > u.id]
+  author int [ref: > u.id ]
+}
+
+Table user_carts {
+  id int
+  user int [ref: > u.id]
+  recipe int [ref: > r.id]
+}
