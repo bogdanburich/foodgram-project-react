@@ -3,7 +3,8 @@ Table recipe as r {
   name text
   image text(path)
   description text
-  time interval
+  cooking_time interval
+  author int [ref: > u.id]
 }
 
 Table tag as t {
