@@ -2,7 +2,7 @@ Table recipe as r {
   id int
   name text
   image text(path)
-  description text
+  text text
   cooking_time interval
   author int [ref: > u.id]
 }
@@ -17,7 +17,7 @@ Table tag as t {
 Table ingridient as i{
   id int
   name text
-  unit text
+  measurement_unit text
 }
 
 Table recipe_tags as rt {

@@ -1,6 +1,9 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+
+BASE_API_URL = 'api'
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path(r'^admin/', admin.site.urls),
+    path(rf'{BASE_API_URL}/', include('users.urls'))
 ]

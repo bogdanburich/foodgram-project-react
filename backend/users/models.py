@@ -17,11 +17,11 @@ class User(AbstractUser):
     role = models.CharField(choices=ROLES, max_length=1, default='user')
 
     REQUIRED_FIELDS = [
+        'id',
+        'email',
         'username',
         'first_name',
         'last_name',
-        'is_banned',
-        'role'
     ]
     USERNAME_FIELD = 'email'
 
