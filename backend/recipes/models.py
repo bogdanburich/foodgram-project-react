@@ -27,6 +27,11 @@ class Tag(models.Model):
         unique=True,
         db_index=True
     )
+    recipe = models.ManyToManyField(
+        'Recipe',
+        db_index=True,
+        related_name='tags'
+    )
 
 
 class Recipe(models.Model):
@@ -41,12 +46,12 @@ class Recipe(models.Model):
             MinValueValidator(1)
         ]
     )
-    tags = models.ManyToManyField(
+    tag = models.ManyToManyField(
         Tag,
         db_index=True,
         related_name='recipes'
     )
-    ingridients = models.ManyToManyField(
+    ingridient = models.ManyToManyField(
         Ingredient,
         through='RecipeIngredients',
         related_name='recipes'
@@ -74,7 +79,7 @@ class RecipeIngredients(models.Model):
     amount = models.IntegerField()
 
 
-class Favorites(models.Model):
+class Favorite(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         db_index=True,
@@ -88,7 +93,7 @@ class Favorites(models.Model):
     )
 
 
-class Carts(models.Model):
+class Cart(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         db_index=True,
