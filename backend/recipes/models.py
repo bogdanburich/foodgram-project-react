@@ -105,3 +105,17 @@ class Cart(models.Model):
         on_delete=models.CASCADE,
         related_name='cart'
     )
+
+
+class Follow(models.Model):
+
+    author = models.ForeignKey(
+        User,
+        related_name='subscribers',
+        on_delete=models.CASCADE
+    )
+    subscriber = models.ForeignKey(
+        User,
+        related_name='subscriptions',
+        on_delete=models.CASCADE
+    )
