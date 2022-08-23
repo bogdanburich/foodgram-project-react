@@ -4,6 +4,7 @@ from django.urls import include, path
 BASE_API_URL = 'api'
 
 urlpatterns = [
-    path(r'^admin/', admin.site.urls),
-    path(rf'{BASE_API_URL}/', include('users.urls'))
+    path('admin/', admin.site.urls),
+    path(f'{BASE_API_URL}/', include('users.urls')),
+    path(f'{BASE_API_URL}/', include('api.urls')),
 ]
