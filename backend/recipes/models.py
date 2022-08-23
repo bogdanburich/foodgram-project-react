@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
 User = get_user_model()
@@ -18,10 +18,18 @@ class Ingredient(models.Model):
 class Tag(models.Model):
     name = models.CharField(
         max_length=200,
-        db_index=True
+        db_index=True,
+        unique=True
     )
     color = models.CharField(
         max_length=7,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex='^#(?:[0-9a-fA-F]{3}){1,2}$',
+                message='Provided color code is invalid.'
+            )
+        ]
     )
     slug = models.SlugField(
         unique=True,
@@ -30,8 +38,12 @@ class Tag(models.Model):
     recipe = models.ManyToManyField(
         'Recipe',
         db_index=True,
-        related_name='tags'
+        related_name='tags',
+        blank=True
     )
+
+    def __str__(self):
+        return self.name
 
 
 class Recipe(models.Model):
