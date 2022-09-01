@@ -4,6 +4,7 @@ from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import ValidationError
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -14,7 +15,7 @@ User = get_user_model()
 
 
 class CustomUserViewSet(UserViewSet):
-    @action(["get"], detail=False)
+    @action(["GET"], detail=False)
     def me(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return super().me(request, *args, **kwargs)
@@ -28,10 +29,13 @@ class CustomUserViewSet(UserViewSet):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def subscriptions(request):
+    paginator = PageNumberPagination()
+
     user = request.user
     subscriptions = User.objects.filter(subscriber__subscriber=user)
-    serializer = CustomUserSerializer(subscriptions, many=True, context={'request': request})
-    return Response({"results": serializer.data})
+    result_page = paginator.paginate_queryset(subscriptions, request)
+    serializer = CustomUserSerializer(result_page, many=True, context={'request': request})
+    return paginator.get_paginated_response(serializer.data)
 
 
 @api_view(['POST', 'DELETE'])
