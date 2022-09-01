@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
-from recipes.models import Follow
+from .models import Follow
 
 User = get_user_model()
 
@@ -17,5 +17,4 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        return (Follow.objects.filter(subscriber=request.user.id, author=obj)
-                .exists())
+        return Follow.objects.filter(subscriber=request.user, author=obj).exists()

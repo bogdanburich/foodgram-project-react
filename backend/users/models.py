@@ -4,7 +4,7 @@ from django.db import models
 ROLES = (
         ('user', 'User'),
         ('admin', 'Admin')
-    )
+)
 
 
 class User(AbstractUser):
@@ -23,3 +23,17 @@ class User(AbstractUser):
         'last_name',
     ]
     USERNAME_FIELD = 'email'
+
+
+class Follow(models.Model):
+
+    author = models.ForeignKey(
+        User,
+        related_name='subscriber',
+        on_delete=models.CASCADE
+    )
+    subscriber = models.ForeignKey(
+        User,
+        related_name='subscription',
+        on_delete=models.CASCADE
+    )
