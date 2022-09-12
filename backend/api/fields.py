@@ -22,5 +22,5 @@ class Base64ImageField(serializers.Field):
             image = base64.b64decode(image_string)
             data = ContentFile(image)
             default_storage.save(path, data)
-            return data
+            return path
         raise serializers.ValidationError(f'Wrong image encoding {encoding}')
