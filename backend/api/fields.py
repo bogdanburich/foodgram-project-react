@@ -9,9 +9,6 @@ from rest_framework import serializers
 
 class Base64ImageField(serializers.Field):
 
-    def to_representation(self, value):
-        return value
-
     def to_internal_value(self, data):
         data = re.split(';|,', data)
         image_string = data.pop()

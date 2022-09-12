@@ -54,7 +54,9 @@ class Recipe(models.Model):
         max_length=200,
         db_index=True
     )
-    image = models.FileField()
+    image = models.FileField(
+        upload_to='recipes/images/'
+    )
     text = models.TextField()
     cooking_time = models.IntegerField(
         validators=[
@@ -91,6 +93,7 @@ class RecipeIngredients(models.Model):
         db_index=True,
         on_delete=models.PROTECT
     )
+    amount = models.PositiveIntegerField()
 
 
 class Favorite(models.Model):
