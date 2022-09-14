@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
+from common.pagination import CustomPageNumberPagination
 from rest_framework import status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import ValidationError
@@ -29,7 +30,7 @@ class CustomUserViewSet(UserViewSet):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def subscriptions(request):
-    paginator = PageNumberPagination()
+    paginator = CustomPageNumberPagination
 
     user = request.user
     subscriptions = User.objects.filter(subscriber__subscriber=user)
