@@ -1,8 +1,10 @@
 from django.contrib.auth import get_user_model
-from recipes.models import Recipe, Ingredient, Tag, RecipeIngredients, Favorite, Cart
-from users.serializers import CustomUserSerializer
-from backend.settings import MEDIA_URL
 from rest_framework import serializers
+
+from backend.settings import MEDIA_URL
+from recipes.models import (Cart, Favorite, Ingredient, Recipe,
+                            RecipeIngredients, Tag)
+from users.serializers import CustomUserSerializer
 
 from .fields import Base64ImageField
 
@@ -87,4 +89,3 @@ class RecipeWriteSerializer(RecipeSerializer):
     class Meta:
         model = Recipe
         fields = ('ingredients', 'tags', 'image', 'name', 'text', 'cooking_time')
-

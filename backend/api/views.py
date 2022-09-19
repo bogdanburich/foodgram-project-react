@@ -1,16 +1,18 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
-from common.pagination import CustomPageNumberPagination
-from recipes.models import Cart, Ingredient, Recipe, RecipeIngredients, Tag, Favorite
-from rest_framework import status, viewsets
-from rest_framework.response import Response
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 
-from .serializers import (IngredientSerializer, RecipeReadSerializer,
-                          RecipeWriteSerializer, RecipeShortSerializer, TagSerializer)
+from common.pagination import CustomPageNumberPagination
+from recipes.models import (Cart, Favorite, Ingredient, Recipe,
+                            RecipeIngredients, Tag)
+
 from .filters import IngredientFilter
+from .serializers import (IngredientSerializer, RecipeReadSerializer,
+                          RecipeShortSerializer, RecipeWriteSerializer,
+                          TagSerializer)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
