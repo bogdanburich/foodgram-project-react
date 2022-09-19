@@ -33,6 +33,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
 
+    def get_queryset(self):
+        queryset = self.queryset
+        user = self.request.user
+
+        if self.request.query_params.get('is_favorited'):
+            queryset = queryset.filter(favorited__user=user)
+
+        if self.request.query_params.get('is_in_shopping_cart'):
+            queryset = queryset.filter(carted__user=user)
+
+        return queryset
+
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return RecipeReadSerializer

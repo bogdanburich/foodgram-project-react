@@ -7,7 +7,7 @@ from django.core.files.storage import default_storage
 from rest_framework import serializers
 
 
-class Base64ImageField(serializers.Field):
+class Base64ImageField(serializers.FileField):
 
     def to_internal_value(self, data):
         data = re.split(';|,', data)

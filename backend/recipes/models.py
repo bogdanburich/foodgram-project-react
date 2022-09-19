@@ -54,9 +54,7 @@ class Recipe(models.Model):
         max_length=200,
         db_index=True
     )
-    image = models.FileField(
-        upload_to='recipes/images/'
-    )
+    image = models.FileField()
     text = models.TextField()
     cooking_time = models.IntegerField(
         validators=[
@@ -68,7 +66,7 @@ class Recipe(models.Model):
         db_index=True,
         related_name='recipes'
     )
-    ingridient = models.ManyToManyField(
+    ingridients = models.ManyToManyField(
         Ingredient,
         through='RecipeIngredients',
         related_name='recipes'
@@ -81,12 +79,15 @@ class Recipe(models.Model):
         default=None
     )
 
+    def __str__(self) -> str:
+        return self.name
+
 
 class RecipeIngredients(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         db_index=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     ingredient = models.ForeignKey(
         Ingredient,
@@ -100,7 +101,8 @@ class Favorite(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         db_index=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='favorited'
     )
     user = models.ForeignKey(
         User,
@@ -114,7 +116,8 @@ class Cart(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         db_index=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='carted'
     )
     user = models.ForeignKey(
         User,

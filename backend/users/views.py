@@ -30,7 +30,7 @@ class CustomUserViewSet(UserViewSet):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def subscriptions(request):
-    paginator = CustomPageNumberPagination
+    paginator = CustomPageNumberPagination()
 
     user = request.user
     subscriptions = User.objects.filter(subscriber__subscriber=user)
