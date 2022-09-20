@@ -4,14 +4,13 @@ from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import ValidationError
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from common.pagination import CustomPageNumberPagination
 
 from .models import Follow
-from api.serializers import CustomUserSerializer
+from api.serializers import SubscriptionUserSerialzier
 
 User = get_user_model()
 
@@ -36,7 +35,7 @@ def subscriptions(request):
     user = request.user
     subscriptions = User.objects.filter(subscriber__subscriber=user)
     result_page = paginator.paginate_queryset(subscriptions, request)
-    serializer = CustomUserSerializer(result_page, many=True, context={'request': request})
+    serializer = SubscriptionUserSerialzier(result_page, many=True, context={'request': request})
     return paginator.get_paginated_response(serializer.data)
 
 
@@ -53,7 +52,7 @@ def subscribe(request, pk):
         if subscription.exists():
             raise ValidationError("Already subscribed.")
         Follow.objects.create(author=author, subscriber=user)
-        serializer = CustomUserSerializer(author, context={'request': request})
+        serializer = SubscriptionUserSerialzier(author, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     if not subscription.exists():
