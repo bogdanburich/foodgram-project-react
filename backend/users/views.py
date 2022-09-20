@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from common.pagination import CustomPageNumberPagination
 
 from .models import Follow
-from .serializers import CustomUserSerializer
+from api.serializers import CustomUserSerializer
 
 User = get_user_model()
 

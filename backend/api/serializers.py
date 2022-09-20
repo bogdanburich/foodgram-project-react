@@ -4,7 +4,9 @@ from rest_framework import serializers
 from backend.settings import MEDIA_URL
 from recipes.models import (Cart, Favorite, Ingredient, Recipe,
                             RecipeIngredients, Tag)
-from users.serializers import CustomUserSerializer
+from djoser.serializers import UserSerializer
+
+from users.models import Follow
 
 from .fields import Base64ImageField
 
@@ -64,6 +66,20 @@ class RecipeShortSerializer(RecipeSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
+
+
+class CustomUserSerializer(UserSerializer):
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = RecipeShortSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'username', 'first_name', 'last_name',
+                  'is_subscribed', 'recipes', 'recipes_count')
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        return Follow.objects.filter(subscriber=request.user, author=obj).exists()
 
 
 class RecipeReadSerializer(RecipeSerializer):
