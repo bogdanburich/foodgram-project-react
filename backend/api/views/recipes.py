@@ -3,16 +3,17 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 
 from common.pagination import CustomPageNumberPagination
 from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 
-from .filters import IngredientFilter
-from .serializers import (IngredientSerializer, RecipeReadSerializer,
-                          RecipeShortSerializer, RecipeWriteSerializer,
-                          TagSerializer)
+from ..permissions import IsAuthor
+from ..filters import IngredientFilter
+from ..serializers import (IngredientSerializer, RecipeReadSerializer,
+                           RecipeShortSerializer, RecipeWriteSerializer,
+                           TagSerializer)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -36,6 +37,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     http_method_names = ('get', 'post', 'patch', 'delete')
+    permission_classes = (IsAuthor & IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         queryset = self.queryset
@@ -84,7 +86,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer.data, status=status.HTTP_200_OK
         )
 
-    @action(detail=True, methods=['POST', 'DELETE'], name='favorite', url_path='favorite', url_name='favorite')
+    @action(
+        detail=True,
+        methods=['POST', 'DELETE'],
+        permission_classes=[IsAuthenticated],
+        name='favorite',
+        url_path='favorite',
+        url_name='favorite')
     def favorite(self, request, pk):
         user = self.request.user
         recipe = get_object_or_404(Recipe, pk=pk)
@@ -113,6 +121,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=True,
             methods=['POST', 'DELETE'],
             name='shopping-cart',
+            permission_classes=[IsAuthenticated],
             url_path='shopping_cart',
             url_name='shopping_cart')
     def shopping_cart(self, request, pk):
@@ -139,12 +148,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_204_NO_CONTENT
             )
         raise ValidationError(f'Recipe {recipe} is not in in cart.')
-
-    @action(detail=False,
-            methods=['GET'],
-            name='download-shopping-cart',
-            url_path='download_shopping_cart',
-            url_name='download_shopping_cart')
-    def download_shopping_cart(self, request):
-        user = self.request.user
-        recipes = Recipe.objects.filter(carted__user=user)
