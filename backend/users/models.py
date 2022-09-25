@@ -13,7 +13,6 @@ class User(AbstractUser):
     username = models.CharField(unique=True, max_length=150)
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
-    is_banned = models.BooleanField(default=False)
     role = models.CharField(choices=ROLES, default='user', max_length=10)
 
     REQUIRED_FIELDS = [
