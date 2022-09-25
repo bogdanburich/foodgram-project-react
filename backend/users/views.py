@@ -7,10 +7,10 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from api.serializers import SubscriptionUserSerialzier
 from common.pagination import CustomPageNumberPagination
 
 from .models import Follow
-from api.serializers import SubscriptionUserSerialzier
 
 User = get_user_model()
 

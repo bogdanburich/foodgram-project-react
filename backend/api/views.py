@@ -3,12 +3,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
 from rest_framework.permissions import SAFE_METHODS
+from rest_framework.response import Response
 
 from common.pagination import CustomPageNumberPagination
-from recipes.models import (Cart, Favorite, Ingredient, Recipe,
-                            RecipeIngredients, Tag)
+from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 
 from .filters import IngredientFilter
 from .serializers import (IngredientSerializer, RecipeReadSerializer,
@@ -140,3 +139,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_204_NO_CONTENT
             )
         raise ValidationError(f'Recipe {recipe} is not in in cart.')
+
+    @action(detail=False,
+            methods=['GET'],
+            name='download-shopping-cart',
+            url_path='download_shopping_cart',
+            url_name='download_shopping_cart')
+    def download_shopping_cart(self, request):
+        user = self.request.user
+        recipes = Recipe.objects.filter(carted__user=user)
