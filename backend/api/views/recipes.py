@@ -1,6 +1,6 @@
 import io
 
-from common.pagination import CustomPageNumberPagination
+from ..pagination import CustomPageNumberPagination
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -16,7 +16,7 @@ from reportlab.lib.units import cm
 from reportlab.lib.pagesizes import A5
 
 
-from ..filters import IngredientFilter
+from ..filters import IngredientFilter, RecipeFilter
 from ..permissions import IsAuthor
 from ..serializers import (IngredientSerializer, RecipeReadSerializer,
                            RecipeShortSerializer, RecipeWriteSerializer,
@@ -43,6 +43,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = CustomPageNumberPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    filterset_class = RecipeFilter
     http_method_names = ('get', 'post', 'patch', 'delete')
     permission_classes = (IsAuthor & IsAuthenticatedOrReadOnly,)
 
