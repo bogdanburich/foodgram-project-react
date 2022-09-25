@@ -1,16 +1,23 @@
+import io
+
+from common.pagination import CustomPageNumberPagination
 from django.shortcuts import get_object_or_404
+from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
+from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import SAFE_METHODS, IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import cm
+from reportlab.lib.pagesizes import A5
 
-from common.pagination import CustomPageNumberPagination
-from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 
-from ..permissions import IsAuthor
 from ..filters import IngredientFilter
+from ..permissions import IsAuthor
 from ..serializers import (IngredientSerializer, RecipeReadSerializer,
                            RecipeShortSerializer, RecipeWriteSerializer,
                            TagSerializer)
@@ -148,3 +155,47 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_204_NO_CONTENT
             )
         raise ValidationError(f'Recipe {recipe} is not in in cart.')
+
+    @action(detail=False,
+            methods=['GET'],
+            name='download_shopping_cart',
+            url_path='download_shopping_cart',
+            permission_classes=[IsAuthenticated])
+    def download_shopping_cart(self, request):
+        user = self.request.user
+        carted_recipes = Recipe.objects.filter(carted__user=user)
+        if not carted_recipes.exists():
+            raise ValidationError('Shopping cart is empty.')
+
+        shopping_list = {}
+        for recipe in carted_recipes:
+            for recipe_ingredient in recipe.ingredients.all():
+                name = recipe_ingredient.ingredient.name
+                measurement_unit = recipe_ingredient.ingredient.measurement_unit
+                if name in shopping_list:
+                    shopping_list[f'{name}']['amount'] += recipe_ingredient.amount
+                else:
+                    shopping_list[f'{name}'] = {
+                        'amount': recipe_ingredient.amount,
+                        'measurement_unit': measurement_unit
+                    }
+
+        buf = io.BytesIO()
+        c = canvas.Canvas(buf, pagesize=A5, bottomup=0)
+        text_object = c.beginText()
+        text_object.setTextOrigin(cm, cm)
+        text_object.setFont('Montserrat', 16)
+        text_object.textLine('Список покупок')
+
+        text_object.setFont('Montserrat', 12)
+        for ingredient, value in shopping_list.items():
+            text_object.textLine(
+                f'{ingredient} - {value["amount"]} {value["measurement_unit"]}'
+            )
+
+        c.drawText(text_object)
+        c.showPage()
+        c.save()
+        buf.seek(0)
+
+        return FileResponse(buf, as_attachment=True, filename='shopping_list.pdf', status=status.HTTP_200_OK)
