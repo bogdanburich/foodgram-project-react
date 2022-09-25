@@ -4,6 +4,7 @@ from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from rest_framework.permissions import SAFE_METHODS
 
 from common.pagination import CustomPageNumberPagination
 from recipes.models import (Cart, Favorite, Ingredient, Recipe,
@@ -34,6 +35,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = CustomPageNumberPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    http_method_names = ('get', 'post', 'patch', 'delete')
 
     def get_queryset(self):
         queryset = self.queryset
@@ -48,7 +50,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        if self.request.method == 'GET':
+        if self.request.method in SAFE_METHODS:
             return RecipeReadSerializer
         return RecipeWriteSerializer
 
@@ -65,6 +67,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
         return Response(
             serializer.data, status=status.HTTP_201_CREATED
+        )
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        serializer = RecipeReadSerializer(
+            instance=serializer.instance,
+            context={'request': self.request}
+        )
+        return Response(
+            serializer.data, status=status.HTTP_200_OK
         )
 
     @action(detail=True, methods=['POST', 'DELETE'], name='favorite', url_path='favorite', url_name='favorite')
