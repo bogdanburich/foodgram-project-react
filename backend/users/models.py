@@ -28,6 +28,9 @@ class User(AbstractUser):
     def recipes_count(self):
         return self.recipes.aggregate(models.Count('id'))['id__count']
 
+    def __str__(self):
+        return f'{self.username}'
+
 
 class Follow(models.Model):
 
@@ -41,3 +44,6 @@ class Follow(models.Model):
         related_name='subscription',
         on_delete=models.CASCADE
     )
+
+    def __str__(self):
+        return f'{self.author} - {self.subscriber}'

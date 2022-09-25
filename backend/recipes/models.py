@@ -82,6 +82,10 @@ class Recipe(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    @property
+    def favorited_count(self):
+        return self.favorited.aggregate(models.Count('id'))['id__count']
+
     class Meta:
         ordering = ['-date_added']
 
@@ -94,6 +98,9 @@ class RecipeIngredients(models.Model):
         related_name='amount_in_recipes'
     )
     amount = models.PositiveIntegerField()
+
+    class Meta:
+        verbose_name_plural = 'Recipe Ingredients'
 
 
 class Favorite(models.Model):
@@ -110,6 +117,9 @@ class Favorite(models.Model):
         related_name='favorites'
     )
 
+    def __str__(self):
+        return f'{self.user} - {self.recipe}'
+
 
 class Cart(models.Model):
     recipe = models.ForeignKey(
@@ -124,3 +134,6 @@ class Cart(models.Model):
         on_delete=models.CASCADE,
         related_name='cart'
     )
+
+    def __str__(self):
+        return f'{self.user} - {self.recipe}'
