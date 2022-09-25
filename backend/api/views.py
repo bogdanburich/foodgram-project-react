@@ -52,42 +52,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeReadSerializer
         return RecipeWriteSerializer
 
-    def _create_ingredients(self, recipe, ingredients):
-        for ingredient in ingredients:
-            ingredient_obj = Ingredient.objects.get(id=ingredient['id'])
-            amount = ingredient['amount']
-            RecipeIngredients.objects.create(
-                recipe=recipe, ingredient=ingredient_obj, amount=amount
-            )
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        serializer = RecipeWriteSerializer(
-            data=request.data,
-            context={'request': request}
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        serializer = RecipeReadSerializer(
+            instance=serializer.instance,
+            context={'request': self.request}
         )
-
-        if serializer.is_valid():
-            ingredients = serializer.validated_data.pop('ingredients')
-            tags = serializer.validated_data.pop('tags')
-            author = self.request.user
-
-            recipe = Recipe.objects.create(
-                author=author, **serializer.validated_data
-            )
-            recipe.tags.set(tags)
-            ingredients = self._create_ingredients(recipe, ingredients)
-
-            serializer = RecipeReadSerializer(
-                instance=recipe,
-                context={'request': request}
-            )
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
-            )
         return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
+            serializer.data, status=status.HTTP_201_CREATED
         )
 
     @action(detail=True, methods=['POST', 'DELETE'], name='favorite', url_path='favorite', url_name='favorite')

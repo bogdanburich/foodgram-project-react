@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from backend.settings import MEDIA_URL
@@ -27,10 +28,26 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit')
 
 
-class AmountSerializer(serializers.Serializer):
+class AmountReadSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='ingredient.id')
+    name = serializers.CharField(source='ingredient.name')
+    measurement_unit = serializers.CharField(source='ingredient.measurement_unit')
 
-    id = serializers.IntegerField()
-    amount = serializers.IntegerField()
+    class Meta:
+        model = RecipeIngredients
+        fields = ('id', 'name', 'measurement_unit', 'amount')
+
+
+class AmountWriteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = RecipeIngredients
+        fields = ('id', 'amount')
+        extra_kwargs = {
+            'id': {
+                'read_only': False
+            }
+        }
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -93,7 +110,7 @@ class SubscriptionUserSerialzier(CustomUserSerializer):
 class RecipeReadSerializer(RecipeSerializer):
 
     tags = TagSerializer(many=True, read_only=True)
-    ingredients = IngredientSerializer(many=True, read_only=True)
+    ingredients = AmountReadSerializer(many=True, read_only=True)
     author = CustomUserSerializer(read_only=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -106,10 +123,31 @@ class RecipeReadSerializer(RecipeSerializer):
 
 class RecipeWriteSerializer(RecipeSerializer):
 
-    ingredients = AmountSerializer(many=True, write_only=True)
+    ingredients = AmountWriteSerializer(many=True, write_only=True)
     tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True, write_only=True)
     image = Base64ImageField()
 
     class Meta:
         model = Recipe
         fields = ('ingredients', 'tags', 'image', 'name', 'text', 'cooking_time')
+
+    def add_ingredients_and_tags(self, instance, validated_data):
+        ingredients, tags = (
+            validated_data.pop('ingredients'), validated_data.pop('tags')
+        )
+        print(ingredients)
+        for ingredient in ingredients:
+            count_of_ingredient, _ = RecipeIngredients.objects.get_or_create(
+                ingredient=get_object_or_404(Ingredient, pk=ingredient['id']),
+                amount=ingredient['amount'],
+            )
+            instance.ingredients.add(count_of_ingredient)
+        instance.tags.set(tags)
+        return instance
+
+    def create(self, validated_data):
+        saved = {}
+        saved['ingredients'] = validated_data.pop('ingredients')
+        saved['tags'] = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data)
+        return self.add_ingredients_and_tags(recipe, saved)

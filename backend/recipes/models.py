@@ -66,9 +66,8 @@ class Recipe(models.Model):
         db_index=True,
         related_name='recipes'
     )
-    ingridients = models.ManyToManyField(
-        Ingredient,
-        through='RecipeIngredients',
+    ingredients = models.ManyToManyField(
+        'RecipeIngredients',
         related_name='recipes'
     )
     author = models.ForeignKey(
@@ -84,15 +83,11 @@ class Recipe(models.Model):
 
 
 class RecipeIngredients(models.Model):
-    recipe = models.ForeignKey(
-        Recipe,
-        db_index=True,
-        on_delete=models.CASCADE,
-    )
     ingredient = models.ForeignKey(
         Ingredient,
         db_index=True,
-        on_delete=models.PROTECT
+        on_delete=models.CASCADE,
+        related_name='amount_in_recipes'
     )
     amount = models.PositiveIntegerField()
 
