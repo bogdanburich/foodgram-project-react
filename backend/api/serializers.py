@@ -135,7 +135,6 @@ class RecipeWriteSerializer(RecipeSerializer):
         ingredients, tags = (
             validated_data.pop('ingredients'), validated_data.pop('tags')
         )
-        print(ingredients)
         for ingredient in ingredients:
             count_of_ingredient, _ = RecipeIngredients.objects.get_or_create(
                 ingredient=get_object_or_404(Ingredient, pk=ingredient['id']),
