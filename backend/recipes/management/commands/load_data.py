@@ -15,7 +15,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        self.stdout.write('Loading ingredients...')
         file_path = os.path.join(settings.TEST_DATA_DIR, 'ingredients.csv')
         reader = DictReader(
             open(file_path, 'r', encoding='utf-8'),
@@ -30,3 +29,21 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f'{ingredient} added!'))
 
         self.stdout.write(self.style.SUCCESS('Ingredients loaded successfully'))
+
+        file_path = os.path.join(settings.TEST_DATA_DIR, 'users.csv')
+        reader = DictReader(
+            open(file_path, 'r', encoding='utf-8'),
+        )
+
+        for row in reader:
+            user = User(
+                email=row['email'],
+                username=row['username'],
+                first_name=row['first_name'],
+                last_name=row['last_name'],
+                password=row['password'],
+            )
+            user.save()
+            self.stdout.write(self.style.SUCCESS(f'{user} added!'))
+
+        self.stdout.write(self.style.SUCCESS('Users loaded successfully'))
