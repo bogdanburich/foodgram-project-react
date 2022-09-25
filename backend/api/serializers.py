@@ -9,6 +9,7 @@ from recipes.models import (Cart, Favorite, Ingredient, Recipe,
 from users.models import Follow
 
 from .fields import Base64ImageField
+from .pagination import RecipeLimitPagination
 
 User = get_user_model()
 
@@ -61,7 +62,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return self.context.get('request')
 
     def get_image(self, obj):
-        request = self.context.get('request')
+        request = self._get_request()
         return f'{request.get_host()}{MEDIA_URL}{obj.image}'
 
     def get_is_favorited(self, obj):
@@ -98,12 +99,20 @@ class CustomUserSerializer(UserSerializer):
 
 
 class SubscriptionUserSerialzier(CustomUserSerializer):
-    recipes = RecipeShortSerializer(many=True, read_only=True)
+    recipes = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ('id', 'email', 'username', 'first_name', 'last_name',
                   'is_subscribed', 'recipes', 'recipes_count')
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        recipes = Recipe.objects.filter(author=obj)
+        paginator = RecipeLimitPagination()
+        page = paginator.paginate_queryset(recipes, request)
+        serializer = RecipeShortSerializer(page, many=True, read_only=True, context={'request': request})
+        return serializer.data
 
 
 class RecipeReadSerializer(RecipeSerializer):
