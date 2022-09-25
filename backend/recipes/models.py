@@ -77,9 +77,13 @@ class Recipe(models.Model):
         related_name='recipes',
         default=None
     )
+    date_added = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return self.name
+
+    class Meta:
+        ordering = ['-date_added']
 
 
 class RecipeIngredients(models.Model):
