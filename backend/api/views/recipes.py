@@ -180,6 +180,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                         'amount': recipe_ingredient.amount,
                         'measurement_unit': measurement_unit
                     }
+        shopping_list.sort()
 
         buf = io.BytesIO()
         c = canvas.Canvas(buf, pagesize=A5, bottomup=0)
