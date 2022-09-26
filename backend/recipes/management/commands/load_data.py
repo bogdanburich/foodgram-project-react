@@ -15,20 +15,20 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        # file_path = os.path.join(settings.TEST_DATA_DIR, 'ingredients.csv')
-        # reader = DictReader(
-        #     open(file_path, 'r', encoding='utf-8'),
-        # )
+        file_path = os.path.join(settings.TEST_DATA_DIR, 'ingredients.csv')
+        reader = DictReader(
+            open(file_path, 'r', encoding='utf-8'),
+        )
 
-        # for row in reader:
-        #     ingredient = Ingredient(
-        #         name=row['name'],
-        #         measurement_unit=row['measurement_unit']
-        #     )
-        #     ingredient.save()
-        #     self.stdout.write(self.style.SUCCESS(f'Ingredient {ingredient} added'))
+        for row in reader:
+            ingredient = Ingredient(
+                name=row['name'],
+                measurement_unit=row['measurement_unit']
+            )
+            ingredient.save()
+            self.stdout.write(self.style.SUCCESS(f'Ingredient {ingredient} added'))
 
-        # self.stdout.write(self.style.SUCCESS('Ingredients loaded successfully'))
+        self.stdout.write(self.style.SUCCESS('Ingredients loaded successfully'))
 
         file_path = os.path.join(settings.TEST_DATA_DIR, 'users.csv')
         reader = DictReader(
@@ -47,18 +47,18 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS('Users loaded successfully'))
 
-        # file_path = os.path.join(settings.TEST_DATA_DIR, 'tags.csv')
-        # reader = DictReader(
-        #     open(file_path, 'r', encoding='utf-8'),
-        # )
+        file_path = os.path.join(settings.TEST_DATA_DIR, 'tags.csv')
+        reader = DictReader(
+            open(file_path, 'r', encoding='utf-8'),
+        )
 
-        # for row in reader:
-        #     tag = Tag(
-        #         name=row['name'],
-        #         color=row['color'],
-        #         slug=row['slug'],
-        #     )
-        #     tag.save()
-        #     self.stdout.write(self.style.SUCCESS(f'Tag {tag} added'))
+        for row in reader:
+            tag = Tag(
+                name=row['name'],
+                color=row['color'],
+                slug=row['slug'],
+            )
+            tag.save()
+            self.stdout.write(self.style.SUCCESS(f'Tag {tag} added'))
 
-        # self.stdout.write(self.style.SUCCESS('Tags loaded successfully'))
+        self.stdout.write(self.style.SUCCESS('Tags loaded successfully'))
