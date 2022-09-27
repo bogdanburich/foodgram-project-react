@@ -61,7 +61,9 @@ class Recipe(models.Model):
         max_length=200,
         db_index=True
     )
-    image = models.FileField()
+    image = models.ImageField(
+        upload_to='recipes/',
+    )
     text = models.TextField()
     cooking_time = models.IntegerField(
         validators=[

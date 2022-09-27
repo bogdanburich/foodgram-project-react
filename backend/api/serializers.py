@@ -52,8 +52,6 @@ class AmountWriteSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
 
-    image = serializers.SerializerMethodField()
-
     class Meta:
         model = Recipe
         fields = '__all__'
@@ -158,7 +156,8 @@ class RecipeWriteSerializer(RecipeSerializer):
         saved = {}
         saved['ingredients'] = validated_data.pop('ingredients')
         saved['tags'] = validated_data.pop('tags')
-        recipe = Recipe.objects.create(**validated_data)
+        image = validated_data.pop('image')
+        recipe = Recipe.objects.create(image=image, **validated_data)
         return self._add_ingredients_and_tags(recipe, saved)
 
     def update(self, instance, validated_data):
