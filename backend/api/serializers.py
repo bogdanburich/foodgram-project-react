@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
 from backend.settings import MEDIA_URL
@@ -8,7 +9,6 @@ from recipes.models import (Cart, Favorite, Ingredient, Recipe,
                             RecipeIngredients, Tag)
 from users.models import Follow
 
-from .fields import Base64ImageField
 from .pagination import RecipeLimitPagination
 
 User = get_user_model()
@@ -95,7 +95,9 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        return Follow.objects.filter(subscriber=request.user, author=obj).exists()
+        if request.user.is_authenticated:
+            return Follow.objects.filter(subscriber=request.user, author=obj).exists()
+        return False
 
 
 class SubscriptionUserSerialzier(CustomUserSerializer):
