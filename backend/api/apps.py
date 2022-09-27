@@ -8,4 +8,4 @@ class ApiConfig(AppConfig):
     name = 'api'
 
     def ready(self):
-        pdfmetrics.registerFont(TTFont('Montserrat', settings.BASE_FONT))
+        pdfmetrics.registerFont(TTFont('Montserrat', settings.STATIC_ROOT + '/fonts/Montserrat-Regular.ttf'))

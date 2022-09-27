@@ -10,7 +10,12 @@ TEST_DATA_DIR = os.path.join(BASE_DIR, 'data')
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = True
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'DEV')
+
+if ENVIRONMENT == 'DEV':
+    DEBUG = True
+else:
+    DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -61,13 +66,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if ENVIRONMENT == 'DEV':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -102,8 +118,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-BASE_FONT = os.path.join(STATIC_ROOT, 'fonts/Montserrat-Regular.ttf')
 
 AUTH_USER_MODEL = 'users.User'
 
