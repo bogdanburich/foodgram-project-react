@@ -21,7 +21,8 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    fields = ('name', 'image', 'text', 'cooking_time', 'author')
+    fields = ('name', 'image', 'text', 'cooking_time', 'author', 'favorited_count')
+    readonly_fields = ('favorited_count',)
     list_display = ('name', 'author', 'favorited_count')
     search_fields = ('name',)
     list_filter = ('author', 'tags')
