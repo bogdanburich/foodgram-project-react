@@ -1,4 +1,9 @@
 version: '3.3'
+
+variables:
+  DOCKER_USERNAME: bburich
+  TAG: latest
+
 services:
 
   db:
@@ -13,22 +18,19 @@ services:
       interval: 5s
 
   backend:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/foodgram_backend:${TAG}
     volumes:
       - static_backend:/app/static_backend/
       - media_value:/app/media/
     env_file:
       - ../.env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: always
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/foodgram_frontend:${TAG}
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
