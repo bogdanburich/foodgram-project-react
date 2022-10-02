@@ -49,6 +49,17 @@ class AmountWriteSerializer(serializers.ModelSerializer):
             }
         }
 
+    def validate(self, data):
+        id = data.get('id')
+        if not Ingredient.objects.filter(id=id).exists():
+            raise serializers.ValidationError(f'"Invalid pk {id} - object does not exist."')
+        return data
+
+    def validate_amount(self, value):
+        if value <= 0:
+            raise serializers.ValidationError('Amount must be greater than 0.')
+        return value
+
 
 class RecipeSerializer(serializers.ModelSerializer):
 
@@ -151,6 +162,11 @@ class RecipeWriteSerializer(RecipeSerializer):
             instance.ingredients.add(count_of_ingredient)
         instance.tags.set(tags)
         return instance
+
+    # def validate_cooking_time(self, value):
+    #     if value <= 0:
+    #         raise serializers.ValidationError('Cooking time must be greater than 0.')
+    #     return value
 
     def create(self, validated_data):
         saved = {}
