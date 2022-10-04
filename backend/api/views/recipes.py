@@ -172,9 +172,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         for recipe in carted_recipes:
             for recipe_ingredient in recipe.ingredients.all():
                 name = recipe_ingredient.ingredient.name
-                measurement_unit = recipe_ingredient.ingredient.measurement_unit
+                measurement_unit = (recipe_ingredient.ingredient.
+                                    measurement_unit)
                 if name in shopping_list:
-                    shopping_list[f'{name}']['amount'] += recipe_ingredient.amount
+                    shopping_list[f'{name}']['amount'] += (recipe_ingredient.
+                                                           amount)
                 else:
                     shopping_list[f'{name}'] = {
                         'amount': recipe_ingredient.amount,
@@ -199,4 +201,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         c.save()
         buf.seek(0)
 
-        return FileResponse(buf, as_attachment=True, filename='shopping_list.pdf', status=status.HTTP_200_OK)
+        return FileResponse(buf, as_attachment=True,
+                            filename='shopping_list.pdf',
+                            status=status.HTTP_200_OK)

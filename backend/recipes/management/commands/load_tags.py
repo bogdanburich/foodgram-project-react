@@ -32,6 +32,8 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f'Tag {tag} added'))
 
             except IntegrityError:
-                self.stdout.write(self.style.ERROR(f'Tag {tag} already loaded'))
+                self.stdout.write(self.style.ERROR(
+                    f'Tag {tag} already loaded')
+                )
 
         self.stdout.write(self.style.SUCCESS('Tags loaded successfully'))
