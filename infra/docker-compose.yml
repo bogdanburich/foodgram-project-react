@@ -16,7 +16,7 @@ services:
   backend:
     image: bburich/foodgram_backend:latest
     volumes:
-      - static_backend:/app/static_backend/
+      - static_backend:/app/static/
       - media_value:/app/media/
     env_file:
       - ./.env
