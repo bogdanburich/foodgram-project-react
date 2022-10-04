@@ -163,11 +163,6 @@ class RecipeWriteSerializer(RecipeSerializer):
         instance.tags.set(tags)
         return instance
 
-    # def validate_cooking_time(self, value):
-    #     if value <= 0:
-    #         raise serializers.ValidationError('Cooking time must be greater than 0.')
-    #     return value
-
     def create(self, validated_data):
         saved = {}
         saved['ingredients'] = validated_data.pop('ingredients')

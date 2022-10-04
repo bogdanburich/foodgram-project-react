@@ -180,7 +180,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                         'amount': recipe_ingredient.amount,
                         'measurement_unit': measurement_unit
                     }
-        shopping_list.sort()
 
         buf = io.BytesIO()
         c = canvas.Canvas(buf, pagesize=A5, bottomup=0)
@@ -190,7 +189,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         text_object.textLine('Список покупок')
 
         text_object.setFont('Montserrat', 12)
-        for ingredient, value in shopping_list.items():
+        for ingredient, value in sorted(shopping_list.items()):
             text_object.textLine(
                 f'{ingredient} - {value["amount"]} {value["measurement_unit"]}'
             )
