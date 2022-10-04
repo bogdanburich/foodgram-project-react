@@ -2,6 +2,13 @@
 
 Social platfrom to publish recipes. To see project go to: http://51.250.98.13
 
+Admin login and password:
+
+```
+bogdan.buritch@gmail.com
+admin
+```
+
 ## Local run
 
 check docker installed and run
@@ -20,7 +27,7 @@ Add .env file to dir infra/ using .env.example file.
 
 ## First deploy to server
 
-1. Clone repo to server
+1. Clone infra/ to server
 2. Add .env file using .env.example file
 3. Add enviromnent variables to CI
 4. Run docker-compose on server: `docker-compose build && docker-compose up`
