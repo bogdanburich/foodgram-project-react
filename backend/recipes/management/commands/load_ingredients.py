@@ -28,9 +28,15 @@ class Command(BaseCommand):
                     measurement_unit=row['measurement_unit']
                 )
                 ingredient.save()
-                self.stdout.write(self.style.SUCCESS(f'Ingredient {ingredient} added'))
+                self.stdout.write(self.style.SUCCESS(
+                    f'Ingredient {ingredient} added')
+                )
 
             except IntegrityError:
-                self.stdout.write(self.style.ERROR(f'Ingredient {ingredient} already loaded'))
+                self.stdout.write(self.style.ERROR(
+                    f'Ingredient {ingredient} already loaded')
+                )
 
-        self.stdout.write(self.style.SUCCESS('Ingredients loaded successfully'))
+        self.stdout.write(self.style.SUCCESS(
+            'Ingredients loaded successfully')
+        )

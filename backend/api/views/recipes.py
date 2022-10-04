@@ -172,15 +172,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
         for recipe in carted_recipes:
             for recipe_ingredient in recipe.ingredients.all():
                 name = recipe_ingredient.ingredient.name
-                measurement_unit = recipe_ingredient.ingredient.measurement_unit
+                measurement_unit = (recipe_ingredient.ingredient.
+                                    measurement_unit)
                 if name in shopping_list:
-                    shopping_list[f'{name}']['amount'] += recipe_ingredient.amount
+                    shopping_list[f'{name}']['amount'] += (recipe_ingredient.
+                                                           amount)
                 else:
                     shopping_list[f'{name}'] = {
                         'amount': recipe_ingredient.amount,
                         'measurement_unit': measurement_unit
                     }
-        shopping_list.sort()
 
         buf = io.BytesIO()
         c = canvas.Canvas(buf, pagesize=A5, bottomup=0)
@@ -190,7 +191,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         text_object.textLine('Список покупок')
 
         text_object.setFont('Montserrat', 12)
-        for ingredient, value in shopping_list.items():
+        for ingredient, value in sorted(shopping_list.items()):
             text_object.textLine(
                 f'{ingredient} - {value["amount"]} {value["measurement_unit"]}'
             )
@@ -200,4 +201,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         c.save()
         buf.seek(0)
 
-        return FileResponse(buf, as_attachment=True, filename='shopping_list.pdf', status=status.HTTP_200_OK)
+        return FileResponse(buf, as_attachment=True,
+                            filename='shopping_list.pdf',
+                            status=status.HTTP_200_OK)
