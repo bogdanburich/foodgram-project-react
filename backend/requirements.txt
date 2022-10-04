@@ -32,8 +32,7 @@ oauthlib==3.2.0
 packaging==21.3
 pep8-naming==0.13.2
 Pillow==9.2.0
-psycopg2==2.9.3
-psycopg2-binary==2.9.3
+psycopg2-binary==2.8.6
 pycodestyle==2.9.1
 pycparser==2.21
 pyflakes==2.5.0
