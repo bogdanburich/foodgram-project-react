@@ -8,11 +8,11 @@ from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import (SAFE_METHODS, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
+from common.constants import ERRORS_KEY
 from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 
 from ..filters import IngredientFilter, RecipeFilter
@@ -117,14 +117,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     serializer.data,
                     status=status.HTTP_201_CREATED
                 )
-            raise ValidationError(f'Recipe {recipe} is already in favorite.')
+            return Response(
+                {ERRORS_KEY: f'Recipe {recipe} is already in favorite.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         if favorite.exists():
             favorite.delete()
             return Response(
                 status=status.HTTP_204_NO_CONTENT
             )
-        raise ValidationError(f'Recipe {recipe} is not in favorite.')
+        return Response(
+            {ERRORS_KEY: f'Recipe {recipe} is not in favorite.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(detail=True,
             methods=['POST', 'DELETE'],
@@ -148,14 +154,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     serializer.data,
                     status=status.HTTP_201_CREATED
                 )
-            raise ValidationError(f'Recipe {recipe} is already in cart.')
+            return Response(
+                {ERRORS_KEY: f'Recipe {recipe} is already in cart.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         if cart.exists():
             cart.delete()
             return Response(
                 status=status.HTTP_204_NO_CONTENT
             )
-        raise ValidationError(f'Recipe {recipe} is not in in cart.')
+        return Response(
+            {ERRORS_KEY: f'Recipe {recipe} is not in cart.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(detail=False,
             methods=['GET'],
@@ -163,25 +175,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             url_path='download_shopping_cart',
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
-        user = self.request.user
-        carted_recipes = Recipe.objects.filter(carted__user=user)
-        if not carted_recipes.exists():
-            raise ValidationError('Shopping cart is empty.')
-
-        shopping_list = {}
-        for recipe in carted_recipes:
-            for recipe_ingredient in recipe.ingredients.all():
-                name = recipe_ingredient.ingredient.name
-                measurement_unit = (recipe_ingredient.ingredient.
-                                    measurement_unit)
-                if name in shopping_list:
-                    shopping_list[f'{name}']['amount'] += (recipe_ingredient.
-                                                           amount)
-                else:
-                    shopping_list[f'{name}'] = {
-                        'amount': recipe_ingredient.amount,
-                        'measurement_unit': measurement_unit
-                    }
+        user = request.user
+        shopping_list = user.get_shopping_list()
+        if not shopping_list:
+            return Response(
+                {ERRORS_KEY: 'Shopping cart is empty.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         buf = io.BytesIO()
         c = canvas.Canvas(buf, pagesize=A5, bottomup=0)

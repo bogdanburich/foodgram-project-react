@@ -3,8 +3,8 @@ from csv import DictReader
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db.utils import IntegrityError
 from django.core.management.base import BaseCommand
+from django.db.utils import IntegrityError
 
 from recipes.models import Tag
 

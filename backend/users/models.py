@@ -30,6 +30,26 @@ class User(AbstractUser):
     def __str__(self):
         return f'{self.username}'
 
+    def get_shopping_list(self):
+        cart = self.cart.all()
+        carted_recipes = [item.recipe for item in cart]
+
+        shopping_list = {}
+        for recipe in carted_recipes:
+            for recipe_ingredient in recipe.ingredients.all():
+                name = recipe_ingredient.ingredient.name
+                measurement_unit = (recipe_ingredient.ingredient.
+                                    measurement_unit)
+                if name in shopping_list:
+                    shopping_list[f'{name}']['amount'] += (recipe_ingredient.
+                                                           amount)
+                else:
+                    shopping_list[f'{name}'] = {
+                        'amount': recipe_ingredient.amount,
+                        'measurement_unit': measurement_unit
+                    }
+        return shopping_list
+
 
 class Follow(models.Model):
 

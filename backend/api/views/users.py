@@ -3,11 +3,11 @@ from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.serializers import SubscriptionUserSerialzier
+from common.constants import ERRORS_KEY
 from users.models import Follow
 
 from ..pagination import CustomPageNumberPagination
@@ -22,7 +22,7 @@ class CustomUserViewSet(UserViewSet):
             return super().me(request, *args, **kwargs)
 
         return Response(
-            {"detail": "User unauthorized."},
+            {ERRORS_KEY: "User unauthorized."},
             status=status.HTTP_401_UNAUTHORIZED
         )
 
@@ -49,15 +49,24 @@ def subscribe(request, pk):
 
     if request.method == 'POST':
         if user == author:
-            raise ValidationError("User cannot be self-followed.")
+            return Response(
+                {ERRORS_KEY: "User cannot be self-subscribed."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         if subscription.exists():
-            raise ValidationError("Already subscribed.")
+            return Response(
+                {ERRORS_KEY: "Already subscribed."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         Follow.objects.create(author=author, subscriber=user)
         serializer = SubscriptionUserSerialzier(author,
                                                 context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     if not subscription.exists():
-        raise ValidationError("Not subscribed for this user.")
+        return Response(
+            {ERRORS_KEY: "Not subscribed for this user."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
     subscription.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
