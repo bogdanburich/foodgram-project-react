@@ -1,13 +1,6 @@
 # foodgram project
 
-Social platfrom to publish recipes. To see project go to: http://51.250.98.13
-
-Admin login and password:
-
-```
-bogdan.buritch@gmail.com
-admin
-```
+Social platfrom to publish recipes.
 
 ## Local run
 
